@@ -1,6 +1,7 @@
 import unittest
 from src.population import Population
 from src.individual import Individual
+from src.ga_engine import GAEngine
 
 
 class PopulationTest(unittest.TestCase):
@@ -13,8 +14,20 @@ class PopulationTest(unittest.TestCase):
         self.population = Population(self.target, 4, [self.individual1, self.individual2, self.individual3,
                                                       self.individual4])
         self.population.calc_fitness_scores()
+        self.ga_engine = GAEngine(5, 4)
 
+    def test_cross_over(self):
+        individual = self.ga_engine.cross_over(self.individual1, self.individual2, [2, 5], [0, 3])
+        self.assertEqual(individual.get_value(), [0, 0, 1, 0, 1])
 
+        individual = self.ga_engine.cross_over(self.individual2, self.individual3, [1, 4], [2, 5])
+        self.assertEqual(individual.get_value(), [1, 0, 1, 1, 0])
+
+        individual = self.ga_engine.cross_over(self.individual4, self.individual3, [1, 2], [2, 3])
+        self.assertEqual(individual.get_value(), [1, 0, 1, 1, 1])
+
+        individual = self.ga_engine.cross_over(self.individual3, self.individual1, [0, 5], [0, 5])
+        self.assertEqual(individual.get_value(), [0, 0, 1, 0, 1])  # self.individual1 has changed above
 
     def tearDown(self) -> None:
         pass
