@@ -3,10 +3,15 @@ from individual import Individual
 
 
 class Population:
-    def __init__(self, target, population_size=10):
+    def __init__(self, target, population_size=10, individuals=None):
         self.gene_set = [0, 1]
         self.population_size = population_size
-        self.individuals = [Individual(len(target.get_value())) for i in range(population_size)]
+        if individuals is None:
+            self.individuals = [Individual(len(target.get_value())) for i in range(population_size)]
+        else:
+            if not (population_size == len(individuals)):
+                raise Exception("population size and length of individuals passed are different")
+            self.individuals = individuals
         self.fitness_scores = []
         self.target = target
         self.calc_fitness_scores()
