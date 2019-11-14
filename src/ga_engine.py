@@ -7,9 +7,8 @@ import numpy as np
 
 
 class GAEngine(GAAbstract):
-    def __init__(self):
-        length = 5
-        self._target = Individual(length, list('1'*length))
+    def __init__(self, length=5):
+        self._target = Individual(length, list(np.ones((length, ), dtype=int)))
         self._population = Population(self.target, 10)
 
     @property
@@ -29,7 +28,7 @@ class GAEngine(GAAbstract):
         self._population = population
 
     def selection(self):
-        pass
+        return self.population.get_n_best_individual(1)
 
     def mutation(self, individual):
         mutation_index = np.random.randint(0, len(self.target.get_value()))
@@ -42,21 +41,24 @@ class GAEngine(GAAbstract):
         pass
 
     def run(self):
+        count = 0
         while True:
             # selection
-            best_individual, best_score = self.population.get_n_best_individual(1)
-            print("best:", best_individual.get_value(), best_score)
+            best_individual, best_score = self.selection()
+            # print("best:", best_individual.get_value(), best_score)
             # mutate
             mutant = self.mutation(best_individual)
             mutant_score = self.population.calc_fitness_score(self.target, mutant)
-            print("mutant:", mutant.get_value(), mutant_score)
+            # print("mutant:", mutant.get_value(), mutant_score)
             if mutant_score > best_score:
                 self.population.add_individual(mutant, mutant_score)
                 print("new individual added")
 
             if mutant_score == len(self.target.get_value()):
                 break
-        print("Best individual is {} and target is {}".format(mutant.get_value(), self.target.get_value()))
+            count = count + 1
+        print("Best individual is {} and target is {}; generations = {}".format(mutant.get_value(),
+                                                                                self.target.get_value(), count))
 
     def should_exit(self):
         pass

@@ -1,3 +1,3 @@
 from ga_engine import GAEngine
 
-GAEngine().run()
+GAEngine(10).run()

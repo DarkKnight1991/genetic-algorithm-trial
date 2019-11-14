@@ -1,6 +1,6 @@
 import unittest
-from population import Population
-from individual import Individual
+from src.population import Population
+from src.individual import Individual
 
 
 class PopulationTest(unittest.TestCase):
@@ -11,12 +11,34 @@ class PopulationTest(unittest.TestCase):
         self.individual3 = Individual(5, [0, 1, 0, 1, 1])
         self.individual4 = Individual(5, [1, 1, 1, 1, 1])
 
-        self.population = Population(target, 4, [self.individual1, self.individual2, self.individual3, self.individual4])
+        self.population = Population(self.target, 4, [self.individual1, self.individual2, self.individual3,
+                                                      self.individual4])
 
     def test_calc_fitness_score(self):
-        self.assertTrue(self.population.calc_fitness_score(self.target, self.individual1) == 0, "tc 1 passed")
-        self.assertTrue(self.population.calc_fitness_score(self.target, self.individual3) == 3, "tc 2 passed")
-        self.assertTrue(self.population.calc_fitness_score(self.target, self.individual4) == 5, "tc 3 passed")
+        self.population.calc_fitness_scores()
+        self.assertTrue(self.population.calc_fitness_score(self.target, self.individual1) == 0, "ind 1 score wrong")
+        self.assertTrue(self.population.calc_fitness_score(self.target, self.individual3) == 3, "ind 3 score wrong")
+        self.assertTrue(self.population.calc_fitness_score(self.target, self.individual4) == 5, "ind 4 score wrong")
+
+    def test_calc_fitness_scores(self):
+        self.assertEqual(self.population.fitness_scores, [0, 2, 3, 5], "fitness scores list wrong")
+
+    def test_get_n_best_individual(self):
+        self.assertEqual(self.population.get_n_best_individual(1), (self.individual4, 5), "best ind returned wrong")
+        self.assertEqual(self.population.get_n_best_individual(3), (self.individual2, 2), "3rd best ind returned wrong")
+
+    def test_add_individual(self):
+        temp_individual = Individual(5, [1, 0, 0, 0, 0])
+        self.population.add_individual(temp_individual)
+        self.assertEqual(self.population.individuals, [temp_individual, self.individual2, self.individual3,
+                                                       self.individual4], "post addition scores wrong")
+        self.assertEqual(self.population.fitness_scores, [1, 2, 3, 5], "post addition scores wrong")
+
+        temp_individual = Individual(5, [1, 0, 1, 1, 1])
+        self.population.add_individual(temp_individual)
+        self.assertEqual(self.population.individuals, [temp_individual, self.individual2, self.individual3,
+                                                       self.individual4], "post addition scores wrong")
+        self.assertEqual(self.population.fitness_scores, [4, 2, 3, 5], "post addition scores wrong")
 
     def tearDown(self) -> None:
         pass
