@@ -7,13 +7,12 @@ import numpy as np
 
 
 class GAEngine(GAAbstract):
-    def __init__(self, length=5, population_size=10, mutation_probability=0.2, cross_over_probability=0.7):
+    def __init__(self, length=5, population_size=10, mutation_probability=0.2):
         if population_size < 2:
             raise Exception("Need at least 2 individuals to compare")
         self.population_size = population_size
         self.individual_size = length
         self.mutation_probability = mutation_probability
-        self.cross_over_probability = cross_over_probability
         self._target = Individual(length, list(np.ones((length, ), dtype=int)))
         self._population = Population(self.target, population_size)
 
@@ -58,33 +57,35 @@ class GAEngine(GAAbstract):
         individual1.set_value(value1)
         return individual1
 
-    def run(self):
+    def run(self, only_mutation=False):
         count = 0
         while True:
             # selection
             (parent1, best_score), (parent2, parent2_score) = self.selection()
             cross_over_prob, mutation_prob = np.random.uniform(0, 1, 2)
-
+            child = None
             # cross over
-            child = self.cross_over(parent1, parent2)
-            fitness = self.population.calc_fitness_score(self.target, child)
+            if not only_mutation:
+                child = self.cross_over(parent1, parent2)
+                fitness = self.population.calc_fitness_score(self.target, child)
 
             # mutate
-            if mutation_prob < self.mutation_probability:
-                child = self.mutation(child)
+            if mutation_prob < self.mutation_probability or only_mutation:
+                child = self.mutation(parent1 if not child else child)
                 fitness = self.population.calc_fitness_score(self.target, child)
 
             if fitness > best_score:
                 self.population.add_individual(child, fitness)
-                print("new best found: {}, {}".format(child.get_value(), fitness))
+                # print("new best found: {}, {}".format(child.get_value(), fitness))
 
             if fitness == len(self.target.get_value()):
                 break
             count = count + 1
-            if count%50 == 0:
+            if count%500 == 0:
                 print("Generation :", count)
         print("Best individual is {} and target is {}; generations = {}".format(child.get_value(),
                                                                                 self.target.get_value(), count))
+        return count
 
     def should_exit(self):
         pass
