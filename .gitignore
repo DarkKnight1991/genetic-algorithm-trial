@@ -1,10 +1,7 @@
 # Ignore everything
 # *
-/outputs
-/train_images
 /.idea
 src/__pycache__/
-src/secrets.py
 src/scratch_pad.py
 # /stock_history
 
